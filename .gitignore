@@ -1,7 +1,7 @@
 venv/
 dataset/
-data.py
+#data.py
 model.pkl
 labels.pkl
-live_predict.py
-model.py
+#live_predict.py
+#model.py

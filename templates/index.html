@@ -1,0 +1,55 @@
+<html>
+    <head>
+        <title> Gesture Based Deskstop Control </title>
+    </head>
+    
+    <body>
+        <h1>Gesture Control Dashboard</h1>
+
+        <h3>Live Camera Feed</h3>
+        <img src="{{ url_for('video_feed') }}" width="600">
+
+        <h2>Status</h2>
+
+        <div>
+            Gesture:<span id="gesture">Loading...</span>
+        </div>
+
+        <div>
+            Confidence:<span id="Confidence">0</span>
+        </div>
+
+        <div>
+            Running: <span id="running">Unknown</span>
+        </div>
+        
+        <br>
+
+        <button onclick="startControl()">Start</button>
+        <button onclick="stopControl()">Stop</button>
+
+        <script>
+            function updateStatus() {
+                fetch("/status")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("gesture").innerText = data.Gesture;
+                    document.getElementById("Confidence").innerText = data.Confidence;
+                    document.getElementById("running").innerText = data.running;
+                });
+            }
+
+            function startControl() {
+                fetch("/start");
+            }
+
+            function stopControl() {
+                fetch("/stop");
+            }
+
+            setInterval(updateStatus,500);
+            updateStatus();
+        </script>
+
+    </body>
+</html>

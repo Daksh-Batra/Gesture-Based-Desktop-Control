@@ -47,8 +47,8 @@ def execution(gesture):
         keyboard.release("alt")
         time.sleep(0.05)
         keyboard.send("ctrl+t")
-        #print("TRIGGER:", smo_ges, "->", action)
-
+        print("TRIGGER:", smo_ges, "->", action)
+    
     else:
         history.clear()
         hand_since=None

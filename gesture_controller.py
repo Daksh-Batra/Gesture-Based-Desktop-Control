@@ -10,17 +10,20 @@ import time
 import pyautogui
 from collections import deque, Counter
 import threading
+import json
 
 class Gesture_controller:
     def __init__(self):
         self.model = joblib.load("model.pkl")
         self.lb=joblib.load("labels.pkl")
 
-        self.gesture_assn = {"PALM":"play_pause",
-                            "FIST":"alt_tab",
-                            "PEACE":"next track",
-                            "4-FINGER":"new_tab"}
+        #self.gesture_assn = {"PALM":"play_pause",
+         #                   "FIST":"alt_tab",
+          #                  "PEACE":"next track",
+           #                 "4-FINGER":"new_tab"}
         
+        with open("gesture_assn.json","r") as f:
+            self.gesture_assn = json.load(f)
         self.history=deque(maxlen=10)
         self.cooldown = 3.0
         self.last_trigger = 0
@@ -81,6 +84,14 @@ class Gesture_controller:
         self.running = False
         if self.thread:
             self.thread.join()
+
+        self.latest_frame=None
+        self.current_gesture=None
+        self.current_confidence=0.0
+
+    def reload_model(self):
+        self.model=joblib.load("model.pkl")
+        self.lb=joblib.load("labels.pkl")
     
     def run_loop(self):
         mp_hands=mp.solutions.hands

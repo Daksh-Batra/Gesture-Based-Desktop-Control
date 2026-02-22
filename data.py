@@ -3,6 +3,7 @@ import numpy as np
 import mediapipe as mp
 import math
 import os
+import sys
 
 mp_hands = mp.solutions.hands
 mp_draw = mp.solutions.drawing_utils
@@ -28,7 +29,14 @@ def norm_features(hand_landmarks):
 
 cam = cv2.VideoCapture(0)
 
-gesture_name=input("Enter gesture name: (e.g. \"palm\") ").strip().upper()
+#gesture_name=input("Enter gesture name: (e.g. \"palm\") ").strip().upper()
+
+if sys.stdin.isatty(): #if running from terminal
+    gesture_name=input("Enter gesture name: (e.g. \"palm\") ").strip()
+else: #running from another process eg flask
+    gesture_name=sys.stdin.readline().strip()
+gesture_name=gesture_name.upper()
+
 os.makedirs("dataset",exist_ok=True)
 save_path=os.path.join("dataset",f"{gesture_name}.npy")
 

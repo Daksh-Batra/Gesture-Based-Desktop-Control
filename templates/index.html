@@ -9,10 +9,21 @@
         <h3>Live Camera Feed</h3>
         <img src="{{ url_for('video_feed') }}" width="600">
 
-        <h2>Status</h2>
+        <h2>Record New Gesture</h2>
+        <input type="text" id="gestureInput" placeholder="Enter Gesture Name">
+        <button onclick="collect()">Record 200 Samples</button>
+        <p id="collectStatus"></p>
+        
+        <h2>Train Model</h2>
+        <button onclick="trainModel()">Train Now</button>
+        <p id="trainStatus"></p>
 
+        <h2>Available Gesture</h2>
+        <ul id="gestureL"></ul> 
+
+        <h2>Status</h2>
         <div>
-            Gesture:<span id="gesture">Loading...</span>
+            Gesture:<span id="Gesture">Loading...</span>
         </div>
 
         <div>
@@ -20,7 +31,7 @@
         </div>
 
         <div>
-            Running: <span id="running">Unknown</span>
+            Running: <span id="Running">Unknown</span>
         </div>
         
         <br>
@@ -29,13 +40,60 @@
         <button onclick="stopControl()">Stop</button>
 
         <script>
+            function gesture_as(){
+                fetch("/gesture")
+                .then(res=>res.json())
+                .then(data => {
+                    const list = document.getElementById("gestureL");
+                    list.innerHTML= "";
+
+                    data.message.forEach(gesture => {
+                        const li = document.createElement("li");
+                        li.innerText = gesture;
+                        list.appendChild(li); 
+                    });
+            });
+            }
+
+            function trainModel(){
+                document.getElementById("trainStatus").innerText = "Training Starting...";
+
+                fetch("/train",{method:"POST"})
+                .then(res => res.json())
+                .then(data =>{ document.getElementById("trainStatus").innerText=data.message;})
+                .catch(err =>{ document.getElementById("trainStatus").innerText = "Retraining Failed";});
+            }
+
+            function collect() {
+                const gesture_name=document.getElementById("gestureInput").value;
+
+                if(!gesture_name){
+                    alert("Please Enter Gesture Name");
+                    return;
+                }
+                document.getElementById("collectStatus").innerText = "Starting Collection...";
+
+                fetch("/collect", {method:"POST",
+                                   headers:{"Content-Type":"application/json"},
+                                   body: JSON.stringify({label : gesture_name})
+                })
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("collectStatus").innerText = data.message;
+                })
+                .catch(err => {
+                    document.getElementById("collectStatus").innerText = "Error during data collection";
+                });
+
+            }
+
             function updateStatus() {
                 fetch("/status")
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById("gesture").innerText = data.Gesture;
+                    document.getElementById("Gesture").innerText = data.Gesture;
                     document.getElementById("Confidence").innerText = data.Confidence;
-                    document.getElementById("running").innerText = data.running;
+                    document.getElementById("Running").innerText = data.Running;
                 });
             }
 
@@ -49,6 +107,7 @@
 
             setInterval(updateStatus,500);
             updateStatus();
+            gesture_as();
         </script>
 
     </body>

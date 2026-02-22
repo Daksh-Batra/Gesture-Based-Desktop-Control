@@ -1,5 +1,6 @@
 venv/
 dataset/
+**/__pycache__
 #data.py
 model.pkl
 labels.pkl

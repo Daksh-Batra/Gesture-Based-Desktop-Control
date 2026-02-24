@@ -9,18 +9,6 @@
         <h3>Live Camera Feed</h3>
         <img src="{{ url_for('video_feed') }}" width="600">
 
-        <h2>Record New Gesture</h2>
-        <input type="text" id="gestureInput" placeholder="Enter Gesture Name">
-        <button onclick="collect()">Record 200 Samples</button>
-        <p id="collectStatus"></p>
-        
-        <h2>Train Model</h2>
-        <button onclick="trainModel()">Train Now</button>
-        <p id="trainStatus"></p>
-
-        <h2>Available Gesture</h2>
-        <ul id="gestureL"></ul> 
-
         <h2>Status</h2>
         <div>
             Gesture:<span id="Gesture">Loading...</span>
@@ -39,6 +27,19 @@
         <button onclick="startControl()">Start</button>
         <button onclick="stopControl()">Stop</button>
 
+        <h2>Record New Gesture</h2>
+        <input type="text" id="gestureInput" placeholder="Enter Gesture Name">
+        <button onclick="collect()">Record 200 Samples</button>
+        <p id="collectStatus"></p>
+        
+        <h2>Train Model</h2>
+        <button onclick="trainModel()">Train Now</button>
+        <p id="trainStatus"></p>
+
+        <h2>Available Gesture</h2>
+        <ul id="gestureL"></ul> 
+
+
         <script>
             function gesture_as(){
                 fetch("/gesture")
@@ -49,10 +50,44 @@
 
                     data.message.forEach(gesture => {
                         const li = document.createElement("li");
-                        li.innerText = gesture;
-                        list.appendChild(li); 
+                        const span = document.createElement("span");
+                        span.innerText = gesture +  " ";
+                        const select = document.createElement("select");
+                        const actions = ["play_pause","alt_tab","next track","new_tab"];
+
+                        actions.forEach(action => {
+                            const opt  = document.createElement("option");
+                            opt.value = action;
+                            opt.innerText = action;
+
+                            if (data.map[gesture]==action){
+                                opt.selected = true;
+                            }
+
+                            select.appendChild(opt);
+                        });
+                        select.onchange = function(){
+                            updateMapping(gesture,select.value);
+                        };
+
+                        li.appendChild(span);
+                        li.appendChild(select);
+                        list.appendChild(li);
+
                     });
             });
+            }
+
+            function updateMapping(gest,act){
+                fetch("/update_gesture",{method : "POST", 
+                                         headers:{"Content-Type":"application/json"},
+                                         body:JSON.stringify({
+                                            gesture:gest,
+                                            action:act
+                                         })
+                })
+                .then(res =>res.json())
+                .then(data => {console.log(data.message);});
             }
 
             function trainModel(){

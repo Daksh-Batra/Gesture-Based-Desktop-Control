@@ -2,5 +2,8 @@
     "PALM": "play_pause",
     "FIST": "alt_tab",
     "PEACE": "next track",
-    "4-FINGER": "new_tab"
+    "4-FINGER": "new_tab",
+    "YOYO": "alt_tab",
+    "THUMB UP": "new_tab",
+    "OK": "new_tab"
 }

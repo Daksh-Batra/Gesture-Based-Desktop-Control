@@ -27,7 +27,9 @@ def gesture():
     for file in files:
         if file.endswith(".npy"):
             gesture_L.append(file.replace(".npy",""))
-    return jsonify({"message":gesture_L})
+    with open("gesture_assn.json","r") as f:
+        d=json.load(f)
+    return jsonify({"message":gesture_L , "map":d})
 
 
 @app.route("/collect",methods=["POST"])
